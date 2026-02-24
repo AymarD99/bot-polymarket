@@ -1,0 +1,28 @@
+# Fichiers sensibles
+.credentials.json
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Données du bot (gardées localement)
+data/*.json
+data/*.csv
+data/*.log
+!data/.gitkeep
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log

@@ -1,0 +1,2 @@
+[2026-02-24T00:54:59.806138+00:00] 📝 Paper Trade: Écart de 93.8% sur trump_deportation (80% confiance)
+[2026-02-24T00:54:59.806900+00:00] ✅ Trade paper: Écart de 93.8% sur trump_deportation

@@ -1,0 +1,43 @@
+{
+  "version": "1.0.0",
+  "mode": "paper", 
+  "capital": {
+    "initial_usd": 10,
+    "current_usd": 10,
+    "currency": "USD"
+  },
+  "risk_management": {
+    "max_position_size_usd": 2,
+    "max_positions": 3,
+    "max_trades_per_day": 2,
+    "stop_loss_percent": -30,
+    "slippage_max_percent": 2,
+    "min_liquidity_usd": 10000
+  },
+  "strategies": {
+    "enabled": ["arbitrage", "mean_reversion", "whale_copy"],
+    "weights": {
+      "arbitrage": 0.4,
+      "mean_reversion": 0.35,
+      "whale_copy": 0.25
+    }
+  },
+  "filters": {
+    "min_market_volume_usd": 50000,
+    "max_days_to_resolution": 90,
+    "exclude_categories": ["sports", "entertainment"]
+  },
+  "logging": {
+    "level": "INFO",
+    "save_all_market_data": true,
+    "telegram_notifications": true
+  },
+  "schedule": {
+    "scan_interval_minutes": 30,
+    "trading_hours": {
+      "start": "09:00",
+      "end": "22:00",
+      "timezone": "Europe/Paris"
+    }
+  }
+}
