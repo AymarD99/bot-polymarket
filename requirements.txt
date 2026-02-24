@@ -1,0 +1,12 @@
+# Bot Polymarket - Dépendances
+
+# API Polymarket (pour live trading)
+py-clob-client>=0.20.0
+
+# Sécurité - Chiffrement
+cryptography>=41.0.0
+
+# HTTP requests (déjà inclus mais bon à préciser)
+requests>=2.31.0
+
+certifi>=2023.0.0

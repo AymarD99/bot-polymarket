@@ -70,21 +70,22 @@ class PolymarketBot:
             self.log(f"Erreur notification: {e}", "ERROR")
     
     def setup_live_credentials(self):
-        """Configuration sécurisée des credentials pour live trading"""
+        """Configuration sécurisée des credentials avec chiffrement"""
         print("\n" + "="*60)
         print("🔐 Configuration Live Trading - Polymarket")
         print("="*60)
         print("\n⚠️  ATTENTION: Ne partagez JAMAIS ces informations!")
         print("="*60 + "\n")
         
-        # Vérifie si credentials déjà configurés
-        creds_file = DATA_DIR / ".credentials.json"
-        if creds_file.exists():
-            print("✅ Credentials déjà configurés")
-            return True
+        # Import sécurité
+        try:
+            from security import encrypt_credentials
+        except ImportError:
+            print("❌ Module security.py manquant")
+            return False
         
         print("📝 Entrez vos credentials API Polymarket:")
-        print("(Ces informations resteront sur votre machine uniquement)\n")
+        print("(Ces informations seront CHIFFRÉES sur votre machine)\n")
         
         try:
             api_key = input("API Key: ").strip()
@@ -96,7 +97,22 @@ class PolymarketBot:
             print("   Laisser vide pour utiliser API key uniquement")
             private_key = input("Private Key (ou Entrée): ").strip()
             
-            # Sauvegarde chiffrée (simple pour l'instant)
+            # Mot de passe maître pour chiffrement
+            print("\n🔑 Créez un mot de passe MAÎTRE pour protéger les credentials:")
+            print("   (Ce mot de passe sera demandé à chaque exécution)")
+            import getpass
+            master_password = getpass.getpass("Mot de passe maître: ")
+            confirm = getpass.getpass("Confirmez: ")
+            
+            if master_password != confirm:
+                print("❌ Les mots de passe ne correspondent pas")
+                return False
+            
+            if len(master_password) < 8:
+                print("❌ Mot de passe trop court (min 8 caractères)")
+                return False
+            
+            # Sauvegarde chiffrée
             credentials = {
                 "api_key": api_key,
                 "secret": secret,
@@ -104,15 +120,12 @@ class PolymarketBot:
                 "private_key": private_key if private_key else None
             }
             
-            with open(creds_file, "w") as f:
-                json.dump(credentials, f)
+            encrypt_credentials(credentials, master_password)
             
-            # Permissions restrictives
-            os.chmod(creds_file, 0o600)
-            
-            print("\n✅ Credentials sauvegardés de manière sécurisée")
-            print(f"📁 Fichier: {creds_file}")
-            print("🔒 Permissions: Lecture seule pour vous uniquement\n")
+            print("\n✅ Credentials CHIFFRÉS et sauvegardés")
+            print(f"📁 Fichier: data/.credentials.enc")
+            print("🔒 Algorithme: Fernet (AES-128)")
+            print("🛡️  KDF: PBKDF2 (480000 iterations)\n")
             return True
             
         except KeyboardInterrupt:
@@ -123,14 +136,24 @@ class PolymarketBot:
             return False
     
     def load_live_credentials(self):
-        """Charge les credentials pour live trading"""
-        creds_file = DATA_DIR / ".credentials.json"
-        if not creds_file.exists():
-            return None
-        
+        """Charge les credentials chiffrés pour live trading"""
         try:
-            with open(creds_file) as f:
-                return json.load(f)
+            from security import decrypt_credentials, CREDS_FILE
+            import getpass
+            
+            if not CREDS_FILE.exists():
+                return None
+            
+            # Demande le mot de passe maître
+            master_password = getpass.getpass("🔑 Mot de passe maître: ")
+            credentials = decrypt_credentials(master_password)
+            
+            if credentials is None:
+                self.log("❌ Mot de passe incorrect ou fichier corrompu", "ERROR")
+                return None
+            
+            return credentials
+            
         except Exception as e:
             self.log(f"Erreur chargement credentials: {e}", "ERROR")
             return None
